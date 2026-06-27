@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crew Coach Competition</title>
+
+<style>
+body{
+    font-family:Arial,sans-serif;
+    background:#111;
+    color:white;
+    margin:30px;
+}
+h1{
+    text-align:center;
+    color:#FFC72C;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th{
+    background:#FFC72C;
+    color:black;
+    padding:12px;
+}
+
+td{
+    border-bottom:1px solid #333;
+    padding:12px;
+    text-align:center;
+}
+
+button{
+    padding:6px 10px;
+    margin:2px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.green{background:#00b050;color:white;}
+.red{background:#d93025;color:white;}
+.yellow{background:#FFC72C;}
+.add{
+    margin-top:20px;
+    text-align:center;
+}
+input{
+    padding:8px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>🏆 Crew Coach Competition</h1>
+
+<div class="add">
+<input id="newName" placeholder="Crew Coach Name">
+<button class="yellow" onclick="addPerson()">Add Person</button>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Rank</th>
+<th>Name</th>
+<th>Points</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="board"></tbody>
+
+</table>
+
+<script>
+
+let people = JSON.parse(localStorage.getItem("crew")) || [
+{name:"Jacob",points:0},
+{name:"Sarah",points:0},
+{name:"Liam",points:0}
+];
+
+function save(){
+localStorage.setItem("crew",JSON.stringify(people));
+}
+
+function render(){
+
+people.sort((a,b)=>b.points-a.points);
+
+let html="";
+
+people.forEach((p,index)=>{
+
+let medal="";
+
+if(index==0) medal="🥇";
+if(index==1) medal="🥈";
+if(index==2) medal="🥉";
+
+html+=`
+<tr>
+
+<td>${medal || index+1}</td>
+
+<td>${p.name}</td>
+
+<td>${p.points}</td>
+
+<td>
+
+<button class="green" onclick="add(${index},0.5)">Safety +0.5</button>
+
+<button class="green" onclick="hazard(${index})">Hazard</button>
+
+<button class="red" onclick="add(${index},-5)">SOC -5</button>
+
+<button class="yellow" onclick="resetScore(${index})">Reset</button>
+
+</td>
+
+</tr>
+`;
+
+});
+
+document.getElementById("board").innerHTML=html;
+
+save();
+
+}
+
+function add(index,value){
+people[index].points+=value;
+render();
+}
+
+function hazard(index){
+
+let place=prompt(
+"Enter:\n1\n2\n3\n4\n5\nor Other"
+);
+
+switch(place){
+
+case "1":
+people[index].points+=10;
+break;
+
+case "2":
+people[index].points+=8;
+break;
+
+case "3":
+people[index].points+=6;
+break;
+
+case "4":
+people[index].points+=4;
+break;
+
+case "5":
+people[index].points+=2;
+break;
+
+default:
+people[index].points+=1;
+
+}
+
+render();
+
+}
+
+function resetScore(index){
+people[index].points=0;
+render();
+}
+
+function addPerson(){
+
+const name=document.getElementById("newName").value;
+
+if(name=="") return;
+
+people.push({
+name,
+points:0
+});
+
+document.getElementById("newName").value="";
+
+render();
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>
